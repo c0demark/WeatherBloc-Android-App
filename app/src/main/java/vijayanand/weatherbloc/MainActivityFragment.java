@@ -17,7 +17,10 @@ import java.util.List;
  */
 public class MainActivityFragment extends Fragment {
 
+    private ListView listView;
     ArrayAdapter<String> mForecastAdapter;
+    ArrayList<String> messages;
+
     public MainActivityFragment() {
     }
 
@@ -47,7 +50,7 @@ public class MainActivityFragment extends Fragment {
         mForecastAdapter = new ArrayAdapter<String>(
                 getActivity(),
                 R.layout.list_item_forecast,
-                R.id.list_view_forecast,
+                R.id.list_item_forecast_textview,
                 weekForecast);
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ListView listview = (ListView) rootView.findViewById(R.id.list_view_forecast);
