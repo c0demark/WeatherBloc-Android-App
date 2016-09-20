@@ -17,13 +17,13 @@ import java.util.List;
  */
 public class MainActivityFragment extends Fragment {
 
+    ArrayAdapter<String> mForecastAdapter;
     public MainActivityFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         String[] data = {
 
@@ -42,15 +42,14 @@ public class MainActivityFragment extends Fragment {
                 "Sun 6/29 - Sunny - 20/7"
 
         };
-        ArrayAdapter<String> mForecastAdapter;
 
-        List<String> weekForecast = new ArrayList<String>(
-        Arrays.asList(data));
+        List<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
         mForecastAdapter = new ArrayAdapter<String>(
                 getActivity(),
                 R.layout.list_item_forecast,
                 R.id.list_view_forecast,
                 weekForecast);
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ListView listview = (ListView) rootView.findViewById(R.id.list_view_forecast);
         listview.setAdapter(mForecastAdapter);
         return rootView;
