@@ -22,13 +22,13 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class ForecastFragment extends Fragment {
 
     private ListView listView;
     ArrayAdapter<String> mForecastAdapter;
     ArrayList<String> weekForecast;
 
-    public MainActivityFragment() {
+    public ForecastFragment() {
     }
 
     @Override
@@ -63,6 +63,9 @@ public class MainActivityFragment extends Fragment {
         ListView listview = (ListView) rootView.findViewById(R.id.list_view_forecast);
         listview.setAdapter(mForecastAdapter);
 
+        return rootView;
+    }
+    public class FetchWeatherTask{
         HttpURLConnection urlconnection = null;
         BufferedReader reader = null;
         String forecastJsonStr = null;
@@ -89,7 +92,7 @@ public class MainActivityFragment extends Fragment {
             forecastJsonStr = buffer.toString();
         }
         catch(IOException e){
-            Log.e("MainActivityFragment", "Error", e);
+            Log.e("ForecastFragment", "Error", e);
             forecastJsonStr = null;
         }
         finally {
@@ -101,12 +104,10 @@ public class MainActivityFragment extends Fragment {
                     reader.close();
                 }
                 catch(final IOException e){
-                    Log.e("MainActivityFragment", "Error closing stream",e);
+                    Log.e("ForecastFragment", "Error closing stream",e);
                 }
             }
         }
 
-
-        return rootView;
     }
 }
