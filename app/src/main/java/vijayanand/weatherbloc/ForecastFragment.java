@@ -5,6 +5,9 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -26,12 +29,30 @@ import java.util.List;
 public class ForecastFragment extends Fragment {
 
     private ListView listView;
-    ArrayAdapter<String> mForecastAdapter;
+    private ArrayAdapter<String> mForecastAdapter;
     ArrayList<String> weekForecast;
 
     public ForecastFragment() {
     }
-
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+        inflater.inflate(R.menu.forecastfragment, menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+        if (id==R.id.action_refresh){
+            FetchWeatherTask weatherTask = new FetchWeatherTask();
+            weatherTask.execute();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -79,7 +100,7 @@ public class ForecastFragment extends Fragment {
             String forecastJsonStr = null;
 
             try{
-                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=600073mode=json&units=metric&cnt=7");
+                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?id=1264527&appid=2f05c62a59c0dbd3ac295b1e52cac6e1&mode=json&units=metric&cnt=7");
                 urlconnection = (HttpURLConnection) url.openConnection();
                 urlconnection.setRequestMethod("GET");
                 urlconnection.connect();
@@ -98,6 +119,7 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
+                Log.v(LOG_TAG, "Forecast JSON String" + forecastJsonStr);
             }
             catch(IOException e){
                 Log.e("ForecastFragment", "Error", e);
