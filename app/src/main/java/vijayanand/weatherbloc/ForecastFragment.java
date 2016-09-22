@@ -1,5 +1,6 @@
 package vijayanand.weatherbloc;
 
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -62,52 +63,60 @@ public class ForecastFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ListView listview = (ListView) rootView.findViewById(R.id.list_view_forecast);
         listview.setAdapter(mForecastAdapter);
-
         return rootView;
+
     }
-    public class FetchWeatherTask{
-        HttpURLConnection urlconnection = null;
-        BufferedReader reader = null;
-        String forecastJsonStr = null;
 
-        try{
-            URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=600073mode=json&units=metric&cnt=7");
-            urlconnection = (HttpURLConnection) url.openConnection();
-            urlconnection.setRequestMethod("GET");
-            urlconnection.connect();
 
-            InputStream inputStream = urlconnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if(inputStream == null){
-                forecastJsonStr = null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while((line = reader.readLine()) != null){
-                buffer.append(line + '\n');
-            }
-            if(buffer.length() == 0){
-                forecastJsonStr = null;
-            }
-            forecastJsonStr = buffer.toString();
-        }
-        catch(IOException e){
-            Log.e("ForecastFragment", "Error", e);
-            forecastJsonStr = null;
-        }
-        finally {
-            if (urlconnection != null){
-                urlconnection.disconnect();
-            }
-            if(reader != null){
-                try{
-                    reader.close();
+
+    public class FetchWeatherTask extends AsyncTask <Void, Void,Void>{
+
+        private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
+        @Override
+        protected Void doInBackground(Void... params) {
+            HttpURLConnection urlconnection = null;
+            BufferedReader reader = null;
+            String forecastJsonStr = null;
+
+            try{
+                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=600073mode=json&units=metric&cnt=7");
+                urlconnection = (HttpURLConnection) url.openConnection();
+                urlconnection.setRequestMethod("GET");
+                urlconnection.connect();
+
+                InputStream inputStream = urlconnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if(inputStream == null){
+                    return null;
                 }
-                catch(final IOException e){
-                    Log.e("ForecastFragment", "Error closing stream",e);
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while((line = reader.readLine()) != null){
+                    buffer.append(line + '\n');
+                }
+                if(buffer.length() == 0){
+                    return null;
+                }
+                forecastJsonStr = buffer.toString();
+            }
+            catch(IOException e){
+                Log.e("ForecastFragment", "Error", e);
+                return null;
+            }
+            finally {
+                if (urlconnection != null){
+                    urlconnection.disconnect();
+                }
+                if(reader != null){
+                    try{
+                        reader.close();
+                    }
+                    catch(final IOException e){
+                        Log.e("ForecastFragment", "Error closing stream",e);
+                    }
                 }
             }
+            return null;
         }
-
     }
 }
