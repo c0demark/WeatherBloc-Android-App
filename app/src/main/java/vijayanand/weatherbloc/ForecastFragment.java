@@ -36,9 +36,9 @@ import java.util.List;
  */
 public class ForecastFragment extends Fragment {
 
-    private ListView listView;
+    //private ListView listView;
     private ArrayAdapter<String> mForecastAdapter;
-    ArrayList<String> weekForecast;
+    //ArrayList<String> weekForecast;
 
     public ForecastFragment() {
     }
@@ -141,9 +141,6 @@ public class ForecastFragment extends Fragment {
                 highAndLow = formatHighLows(high, low);
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
-            for (String s : resultStrs) {
-                Log.v(LOG_TAG, "Forecast entry: " + s);
-            }
             return resultStrs;
         }
 
@@ -192,11 +189,14 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
-                Log.v(LOG_TAG, "Forecast JSON String" + forecastJsonStr);
-            } catch (IOException e) {
-                Log.e("ForecastFragment", "Error", e);
+            }
+
+            catch (IOException e) {
+                Log.e(LOG_TAG, "Error", e);
                 return null;
-            } finally {
+            }
+
+            finally {
                 if (urlconnection != null) {
                     urlconnection.disconnect();
                 }
@@ -204,7 +204,7 @@ public class ForecastFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e("ForecastFragment", "Error closing stream", e);
+                        Log.e(LOG_TAG, "Error closing stream", e);
                     }
                 }
             }
@@ -215,6 +215,16 @@ public class ForecastFragment extends Fragment {
                 e.printStackTrace();
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) {
+            if (result!=null){
+                mForecastAdapter.clear();
+                for(String dayForecastStr : result){
+                    mForecastAdapter.add(dayForecastStr);
+                }
+            }
         }
     }
 }
