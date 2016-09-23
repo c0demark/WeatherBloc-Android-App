@@ -1,5 +1,6 @@
 package vijayanand.weatherbloc;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -48,7 +49,7 @@ public class ForecastFragment extends Fragment {
         int id = item.getItemId();
         if (id==R.id.action_refresh){
             FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute();
+            weatherTask.execute("1264527");
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -90,17 +91,36 @@ public class ForecastFragment extends Fragment {
 
 
 
-    public class FetchWeatherTask extends AsyncTask <Void, Void,Void>{
+    public class FetchWeatherTask extends AsyncTask <String, Void,Void>{
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Void doInBackground(String... params) {
+
+            if(params.length==0){
+                return null;
+            }
             HttpURLConnection urlconnection = null;
             BufferedReader reader = null;
             String forecastJsonStr = null;
 
+            String format="json";
+            String units="metric";
+            int numDays=7;
+
             try{
-                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?id=1264527&appid=2f05c62a59c0dbd3ac295b1e52cac6e1&mode=json&units=metric&cnt=7");
+
+                final String FORECAST_BASE_URL="http://api.openweathermap.org/data/2.5/forecast/daily?=";
+                final String QUERY_PARAM="id";
+                final String FORMAT_PARAM="mode";
+                final String UNITS_PARAM="units";
+                final String DAYS_PARAM="cnt";
+                final String APPID_PARAM="APPID";
+
+                Uri builtUri=Uri.parse(FORECAST_BASE_URL).buildUpon().appendQueryParameter(QUERY_PARAM, params[0]).appendQueryParameter(FORECAST_BASE_URL, FORMAT_PARAM).appendQueryParameter(UNITS_PARAM, units).appendQueryParameter(DAYS_PARAM, Integer.toString(numDays)).appendQueryParameter(APPID_PARAM, BuildConfig.OPEN_WEATHER_MAP_API_KEY).build();
+                URL url=new URL(builtUri.toString());
+                Log.v(LOG_TAG, "BUILT URI"+ builtUri.toString());
+
                 urlconnection = (HttpURLConnection) url.openConnection();
                 urlconnection.setRequestMethod("GET");
                 urlconnection.connect();
