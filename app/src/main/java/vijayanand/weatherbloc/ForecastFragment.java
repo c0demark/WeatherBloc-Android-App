@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +27,8 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -103,12 +104,6 @@ public class ForecastFragment extends Fragment {
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
-
-        private String getReadableDateString(long time) {
-            SimpleDateFormat shortenendDateFormat = new SimpleDateFormat("EEE MMM dd");
-            return shortenendDateFormat.format(time);
-        }
-
         private String formatHighLows(double high, double low) {
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
@@ -125,19 +120,19 @@ public class ForecastFragment extends Fragment {
             final String OWM_DESCRIPTION = "main";
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
-            Time dayTime = new Time();
-            dayTime.setToNow();
-            int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
-            dayTime = new Time();
             String[] resultStrs = new String[numDays];
             for (int i = 0; i < weatherArray.length(); i++) {
                 String day;
                 String description;
                 String highAndLow;
                 JSONObject dayForecast = weatherArray.getJSONObject(i);
-                long dateTime;
-                dateTime = dayTime.setJulianDay(julianStartDay + i);
-                day = getReadableDateString(dateTime);
+
+                GregorianCalendar gc = new GregorianCalendar();
+                gc.add(GregorianCalendar.DATE, i);
+                Date time = gc.getTime();
+                SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd");
+                day = shortenedDateFormat.format(time);
+
                 JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
                 description = weatherObject.getString(OWM_DESCRIPTION);
                 JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
@@ -153,7 +148,7 @@ public class ForecastFragment extends Fragment {
         }
 
         @Override
-        protected String doInBackground(String... params) {
+        protected String[] doInBackground(String... params) {
 
             if (params.length == 0) {
                 return null;
