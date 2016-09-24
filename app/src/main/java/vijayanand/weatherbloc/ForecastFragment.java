@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -30,7 +31,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-
+import android.widget.Toast;
+import android.widget.AdapterView;
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -96,6 +98,13 @@ public class ForecastFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ListView listview = (ListView) rootView.findViewById(R.id.list_view_forecast);
         listview.setAdapter(mForecastAdapter);
+        listview.setOnItemClickListener(new AdapterView.onItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l){
+                String forecast=mForecastAdapter.getItem(position);
+                Toast.makeText(getActivity(),forecast, Toast.LENGTH_SHORT).show();
+            }
+        });
         return rootView;
 
     }
