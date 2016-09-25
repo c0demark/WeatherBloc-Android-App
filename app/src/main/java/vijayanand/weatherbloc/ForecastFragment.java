@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.onItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -32,7 +33,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import android.widget.Toast;
-import android.widget.AdapterView;
 /**
  * A placeholder fragment containing a simple view.
  */
