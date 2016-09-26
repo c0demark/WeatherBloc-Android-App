@@ -1,5 +1,6 @@
 package vijayanand.weatherbloc;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.onItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import android.widget.Toast;
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -98,11 +97,13 @@ public class ForecastFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ListView listview = (ListView) rootView.findViewById(R.id.list_view_forecast);
         listview.setAdapter(mForecastAdapter);
-        listview.setOnItemClickListener(new AdapterView.onItemClickListener(){
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l){
                 String forecast=mForecastAdapter.getItem(position);
-                Toast.makeText(getActivity(),forecast, Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT,forecast);
+                startActivity(intent);
             }
         });
         return rootView;
