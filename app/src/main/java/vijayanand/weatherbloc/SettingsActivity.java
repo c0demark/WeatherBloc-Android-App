@@ -11,6 +11,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    addPreferencesFromResource(R.xml.pref_general);
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
     }
     private void bindPreferenceSummaryToValue(Preference preference){
         onPreferenceChange(preference, PreferenceManager
@@ -19,14 +21,17 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     }
 
     @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        String stringValue=newValue.toString();
+    public boolean onPreferenceChange(Preference preference, Object value) {
+        String stringValue=value.toString();
         if (preference instanceof ListPreference){
             ListPreference listPreference=(ListPreference) preference;
             int PrefIndex=listPreference.findIndexOfValue(stringValue);
             if (PrefIndex>=0){
                 preference.setSummary(stringValue);
             }
+        }
+        else {
+            preference.setSummary(stringValue);
         }
 
         return true;
