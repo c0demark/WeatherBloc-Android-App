@@ -28,7 +28,7 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-    getMenuInflater().inflate(R.menu.menu , menu);
+    getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -51,9 +51,10 @@ public class DetailActivity extends AppCompatActivity {
 
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
             Intent intent=getActivity().getIntent();
-            if (intent!=null&intent.hasExtra(Intent.EXTRA_TEXT)){
+            if (intent!=null&&intent.hasExtra(Intent.EXTRA_TEXT)){
                 String forecastStr=intent.getStringExtra(Intent.EXTRA_TEXT);
-                ((TextView)rootView.findViewById(R.id.detail_text)).setText(forecastStr);
+                ((TextView)rootView.findViewById(R.id.detail_text))
+                        .setText(forecastStr);
             }
             return rootView;
         }

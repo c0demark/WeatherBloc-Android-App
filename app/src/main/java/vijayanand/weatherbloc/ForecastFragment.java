@@ -1,9 +1,11 @@
 package vijayanand.weatherbloc;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,17 +30,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ForecastFragment extends Fragment {
 
     //private ListView listView;
-    private ArrayAdapter<String> mForecastAdapter;
+    private ArrayAdapter<String> mForecastAdapter=null;
     //ArrayList<String> weekForecast;
 
     public ForecastFragment() {
@@ -59,8 +59,7 @@ public class ForecastFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute("1264527");
+            updateWeather();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -70,31 +69,14 @@ public class ForecastFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        String[] data = {
-
-                "Mon 6/23 - Sunny - 31/17",
-
-                "Tue 6/24 - Foggy - 21/8",
-
-                "Wed 6/25 - Cloudy - 22/17",
-
-                "Thurs 6/26 - Rainy - 18/11",
-
-                "Fri 6/27 - Foggy - 21/10",
-
-                "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
-
-                "Sun 6/29 - Sunny - 20/7"
-
-        };
-
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
-        mForecastAdapter = new ArrayAdapter<String>(
+        mForecastAdapter=new ArrayAdapter<String>(
                 getActivity(),
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview,
-                weekForecast);
+                new ArrayList<String>());
+
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
         ListView listview = (ListView) rootView.findViewById(R.id.list_view_forecast);
         listview.setAdapter(mForecastAdapter);
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener(){
@@ -110,10 +92,26 @@ public class ForecastFragment extends Fragment {
 
     }
 
+    private void updateWeather(){
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location=prefs.getString(getString(R.string.pref_location_key),getString(R.string.pref_location_default));
+        weatherTask.execute(location);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
 
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
+        private String getReadableDateString(long time){
+            SimpleDateFormat shortenedDateFormat=new SimpleDateFormat("EEE MMM dd");
+            return shortenedDateFormat.format(time);
+        }
         private String formatHighLows(double high, double low) {
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
@@ -128,9 +126,12 @@ public class ForecastFragment extends Fragment {
             final String OWM_MAX = "max";
             final String OWM_MIN = "min";
             final String OWM_DESCRIPTION = "main";
+
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
+
             String[] resultStrs = new String[numDays];
+
             for (int i = 0; i < weatherArray.length(); i++) {
                 String day;
                 String description;
@@ -146,9 +147,11 @@ public class ForecastFragment extends Fragment {
                 JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
                 description = weatherObject.getString(OWM_DESCRIPTION);
                 JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
+
                 double high = temperatureObject.getDouble(OWM_MAX);
                 double low = temperatureObject.getDouble(OWM_MIN);
                 highAndLow = formatHighLows(high, low);
+
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
             return resultStrs;
