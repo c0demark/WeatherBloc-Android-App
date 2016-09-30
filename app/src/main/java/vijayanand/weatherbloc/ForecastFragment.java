@@ -107,6 +107,7 @@ public class ForecastFragment extends Fragment {
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
         private String getReadableDateString(long time){
+
             SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd");
             return shortenedDateFormat.format(time);
         }
@@ -114,7 +115,7 @@ public class ForecastFragment extends Fragment {
         private String formatHighLows(double high, double low, String unitType) {
 
             if(unitType.equals(getString(R.string.pref_units_imperial))){
-                high=high*1.8+32;
+                high=(high*1.8)+32;
                 low=(low*1.8)+32;
             }
             else if(!unitType.equals(getString(R.string.pref_units_metric))){
@@ -122,6 +123,7 @@ public class ForecastFragment extends Fragment {
             }
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
+
             String highLowStr = roundedHigh + "/" + roundedLow;
             return highLowStr;
         }
@@ -144,8 +146,8 @@ public class ForecastFragment extends Fragment {
             dayTime = new Time();
             String[] resultStrs = new String[numDays];
 
-            SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String unitType=sharedPreferences.getString(getString(R.string.pref_units_imperial), getString(pref_units_metric));
+            SharedPreferences sharedprefs=PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String unitType=sharedprefs.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_metric));
 
             for(int i = 0; i < weatherArray.length(); i++) {
                 String day;
