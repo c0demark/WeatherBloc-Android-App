@@ -1,8 +1,10 @@
 package vijayanand.weatherbloc;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
+
 import java.util.HashSet;
 
 public class TestDb extends AndroidTestCase {
@@ -65,6 +67,29 @@ public class TestDb extends AndroidTestCase {
 
     public void testLocationTable() {
 
+        vijayanand.weatherbloc.WeatherDbHelper dbHelper=new vijayanand.weatherbloc.WeatherDbHelper(mContext);
+        SQLiteDatabase db=dbHelper.getWritableDatabase();
+        ContentValues testValues= vijayanand.weatherbloc.TestUtilities.createNorthPoleLocationValues();
+        long locationRowId;
+        locationRowId = db.insert(vijayanand.weatherbloc.WeatherContract.LocationEntry.TABLE_NAME, null, testValues);
+        assertTrue(locationRowId != -1);
+        Cursor cursor = db.query(
+                vijayanand.weatherbloc.WeatherContract.LocationEntry.TABLE_NAME,
+                null, // all columns
+                null, // Columns for the "where" clause
+                null, // Values for the "where" clause
+                null, // columns to group by
+                null, // columns to filter by row groups
+                null // sort order
+        );
+
+        assertTrue( "Error: No Records returned from location query", cursor.moveToFirst() );
+        vijayanand.weatherbloc.TestUtilities.validateCurrentRecord("Error: Location Query Validation Failed",
+                cursor, testValues);
+
+        assertFalse("Error, more than one record returned from location query", cursor.moveToNext());
+        cursor.close();
+        db.close();
     }
 
     public void testWeatherTable() {
