@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import vijayanand.weatherbloc.WeatherContract.LocationEntry;
 import vijayanand.weatherbloc.WeatherContract.WeatherEntry;
@@ -156,6 +157,44 @@ public class TestProvider extends AndroidTestCase {
             assertEquals("Error: Location Query did not properly set NotificationUri",
                     locationCursor.getNotificationUri(), LocationEntry.CONTENT_URI);
         }
+    }
+
+    public void testUpdateLocation() {
+
+        ContentValues values = TestUtilities.createNorthPoleLocationValues();
+        Uri locationUri = mContext.getContentResolver().
+                insert(LocationEntry.CONTENT_URI, values);
+        long locationRowId = ContentUris.parseId(locationUri);
+        assertTrue(locationRowId != -1);
+        Log.d(LOG_TAG, "New row id: " + locationRowId);
+
+        ContentValues updatedValues = new ContentValues(values);
+        updatedValues.put(LocationEntry._ID, locationRowId);
+        updatedValues.put(LocationEntry.COLUMN_CITY_NAME, "Santa's Village");
+
+        Cursor locationCursor = mContext.getContentResolver().query(LocationEntry.CONTENT_URI, null, null, null, null);
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        locationCursor.registerContentObserver(tco);
+
+        int count = mContext.getContentResolver().update(
+                LocationEntry.CONTENT_URI, updatedValues, LocationEntry._ID + "= ?",
+                new String[] { Long.toString(locationRowId)});
+        assertEquals(count, 1);
+        tco.waitForNotificationOrFail();
+
+        locationCursor.unregisterContentObserver(tco);
+        locationCursor.close();
+        Cursor cursor = mContext.getContentResolver().query(
+                LocationEntry.CONTENT_URI,
+                null,
+                LocationEntry._ID + " = " + locationRowId,
+                null,
+                null
+       );
+
+        TestUtilities.validateCursor("testUpdateLocation.  Error validating location entry update.",
+                cursor, updatedValues);
+        cursor.close();
     }
 
     static private final int BULK_INSERT_RECORDS_TO_INSERT = 10;
