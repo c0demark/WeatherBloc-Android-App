@@ -197,6 +197,99 @@ public class TestProvider extends AndroidTestCase {
         cursor.close();
     }
 
+gi    public void testInsertReadProvider() {
+
+        ContentValues testValues = TestUtilities.createNorthPoleLocationValues();
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(LocationEntry.CONTENT_URI, true, tco);
+        Uri locationUri = mContext.getContentResolver().insert(LocationEntry.CONTENT_URI, testValues);
+        tco.waitForNotificationOrFail();
+
+        mContext.getContentResolver().unregisterContentObserver(tco);
+        long locationRowId = ContentUris.parseId(locationUri);
+
+        assertTrue(locationRowId != -1);
+        Cursor cursor = mContext.getContentResolver().query(
+                LocationEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        TestUtilities.validateCursor("testInsertReadProvider. Error validating LocationEntry.",
+                cursor, testValues);
+
+        ContentValues weatherValues = TestUtilities.createWeatherValues(locationRowId);
+        tco = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(WeatherEntry.CONTENT_URI, true, tco);
+
+        Uri weatherInsertUri = mContext.getContentResolver()
+                .insert(WeatherEntry.CONTENT_URI, weatherValues);
+
+        assertTrue(weatherInsertUri != null);
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        Cursor weatherCursor = mContext.getContentResolver().query(
+                WeatherEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        TestUtilities.validateCursor("testInsertReadProvider. Error validating WeatherEntry insert.",
+                weatherCursor, weatherValues);
+        weatherValues.putAll(testValues);
+
+        weatherCursor = mContext.getContentResolver().query(
+                WeatherEntry.buildWeatherLocation(TestUtilities.TEST_LOCATION),
+                null,
+                null,
+                null,
+                null
+        );
+
+        TestUtilities.validateCursor("testInsertReadProvider.  Error validating joined Weather and Location Data.",
+                weatherCursor, weatherValues);
+        weatherCursor = mContext.getContentResolver().query(
+                WeatherEntry.buildWeatherLocationWithStartDate(
+                        TestUtilities.TEST_LOCATION, TestUtilities.TEST_DATE),
+                null,
+                null,
+                null,
+                null
+        );
+        TestUtilities.validateCursor("testInsertReadProvider.  Error validating joined Weather and Location Data with start date.",
+                weatherCursor, weatherValues);
+        weatherCursor = mContext.getContentResolver().query(
+                WeatherEntry.buildWeatherLocationWithDate(TestUtilities.TEST_LOCATION, TestUtilities.TEST_DATE),
+                null,
+                null,
+                null,
+                null
+        );
+
+        TestUtilities.validateCursor("testInsertReadProvider.  Error validating joined Weather and Location data for a specific date.",
+                weatherCursor, weatherValues);
+    }
+
+    public void testDeleteRecords() {
+
+        testInsertReadProvider();
+        TestUtilities.TestContentObserver locationObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(LocationEntry.CONTENT_URI, true, locationObserver);
+        TestUtilities.TestContentObserver weatherObserver = TestUtilities.getTestContentObserver();
+
+        mContext.getContentResolver().registerContentObserver(WeatherEntry.CONTENT_URI, true, weatherObserver);
+        deleteAllRecordsFromProvider();
+        locationObserver.waitForNotificationOrFail();
+
+        weatherObserver.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(locationObserver);
+        mContext.getContentResolver().unregisterContentObserver(weatherObserver);
+    }
+
+
     static private final int BULK_INSERT_RECORDS_TO_INSERT = 10;
 
     static ContentValues[] createBulkInsertWeatherValues(long locationRowId) {
