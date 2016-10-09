@@ -1,4 +1,4 @@
-package vijayanand.weatherbloc.utils;
+package vijayanand.weatherbloc;
 
 import junit.framework.Assert;
 import java.util.concurrent.Callable;
