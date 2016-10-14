@@ -197,7 +197,7 @@ public class TestProvider extends AndroidTestCase {
         cursor.close();
     }
 
-gi    public void testInsertReadProvider() {
+   public void testInsertReadProvider() {
 
         ContentValues testValues = TestUtilities.createNorthPoleLocationValues();
         TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();

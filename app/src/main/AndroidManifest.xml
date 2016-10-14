@@ -36,6 +36,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="vijayanand.weatherbloc.MainActivity" />
         </activity>
+        <Provider
+            android:authorities="vijayanand.weatherbloc"
+            android:name=".data.WeatherProvider" />
     </application>
 
 </manifest>

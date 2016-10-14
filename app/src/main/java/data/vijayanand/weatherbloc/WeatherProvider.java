@@ -9,13 +9,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-import vijayanand.weatherbloc.WeatherContract;
-import vijayanand.weatherbloc.WeatherDbHelper;
-
 public class WeatherProvider extends ContentProvider {
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
-    private WeatherDbHelper mOpenHelper;
+    private vijayanand.weatherbloc.WeatherDbHelper mOpenHelper;
 
     static final int WEATHER = 100;
     static final int WEATHER_WITH_LOCATION = 101;
@@ -106,7 +103,7 @@ public class WeatherProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
 
-        mOpenHelper = new WeatherDbHelper(getContext());
+        mOpenHelper = new vijayanand.weatherbloc.WeatherDbHelper(getContext());
         return true;
     }
 

@@ -13,8 +13,6 @@ import android.test.AndroidTestCase;
 import java.util.Map;
 import java.util.Set;
 
-import vijayanand.weatherbloc.utils.PollingCheck;
-
 public class TestUtilities extends AndroidTestCase {
 
     static final String TEST_LOCATION = "99705";
@@ -110,7 +108,8 @@ public class TestUtilities extends AndroidTestCase {
         }
 
         public void waitForNotificationOrFail() {
-            new PollingCheck(5000) {
+            new vijayanand.weatherbloc.PollingCheck(5000) {
+
                 @Override
                 protected boolean check() {
                     return mContentChanged;
